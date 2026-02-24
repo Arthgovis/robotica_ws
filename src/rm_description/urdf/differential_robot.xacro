@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<robot name="robot_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ============================================ -->
+  <!-- ARQUIVO PRINCIPAL                            -->
+  <!-- Importa propriedades e macros, define o robô -->
+  <!-- ============================================ -->
+
+  <!--  
+    Requisitos do Robô Diferencial
+    O robô deve conter:
+
+    Base (Chassis):
+    - Representado por um cilindro
+    - Deve conter base_footprint e base_link
+    
+    Rodas:
+    - Duas rodas posicionadas e alinhadas no eixo Y
+    - right_wheel: usa cylinder_link com Y+ (positive Y offset)
+    - left_wheel: usa cylinder_link com Y- (negative Y offset)
+    - Joints do tipo continuous (rotação infinita)
+    
+    Caster Ball:
+    - Uma caster ball para estabilidade
+    - Deve tocar o chão no mesmo nível que as rodas
+
+    Estrutura:
+    base_footprint
+        └── base_link (chassis - centro de rotação, entre as rodas)
+                ├── right_wheel (Y+)
+                ├── left_wheel (Y-)
+                └── caster_ball
+  -->
+
+  <!-- ==================== -->
+  <!-- IMPORTAÇÃO DE ARQUIVOS -->
+  <!-- ==================== -->
+  <!--
+    xacro:include importa o conteúdo de outros arquivos .xacro
+    $(find package_name) retorna o caminho do pacote ROS
+  -->
+  <xacro:include filename="$(find rm_description)/urdf/dr_properties.xacro"/>
+  <xacro:include filename="$(find rm_description)/urdf/dr_macros.xacro"/>
+
+  <!-- ==================== -->
+  <!-- BASE FOOTPRINT       -->
+  <!-- ==================== -->
+  <link name="base_footprint"/>
+
+  <!-- ==================== -->
+  <!-- BASE LINK (CHASSIS)   -->
+  <!-- ==================== -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${chassis_mass}"/>
+      <inertia
+        ixx="${(1/12) * chassis_mass * (chassis_width*chassis_width + chassis_height*chassis_height)}"
+        ixy="0.0" ixz="0.0"
+        iyy="${(1/12) * chassis_mass * (chassis_length*chassis_length + chassis_height*chassis_height)}"
+        iyz="0.0"
+        izz="${(1/12) * chassis_mass * (chassis_length*chassis_length + chassis_width*chassis_width)}"/>
+    </inertial>
+  </link>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 ${wheel_1_radius}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==================== -->
+  <!-- RIGHT WHEEL (Y+)      -->
+  <!-- ==================== -->
+  <!-- Usa cylinder_link com Y+ para posicionar o cilindro na direção positiva do eixo Y -->
+  <xacro:cylinder_link_right
+    name="right_wheel"
+    length="${wheel_1_length}"
+    radius="${wheel_1_radius}"
+    mass="${wheel_1_mass}"
+    material="red"/>
+
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel"/>
+    <origin xyz="0 ${chassis_width/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- ==================== -->
+  <!-- LEFT WHEEL (Y-)      -->
+  <!-- ==================== -->
+  <!-- Usa cylinder_link com Y- para posicionar o cilindro na direção negativa do eixo Y -->
+  <xacro:cylinder_link_left
+    name="left_wheel"
+    length="${wheel_2_length}"
+    radius="${wheel_2_radius}"
+    mass="${wheel_2_mass}"
+    material="red"/>
+
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel"/>
+    <origin xyz="0 ${-chassis_width/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- ==================== -->
+  <!-- CASTER BALL          -->
+  <!-- ==================== -->
+  <!-- Esfera para estabilidade frontal/traseira, tocando o chão no mesmo nível das rodas -->
+  <xacro:sphere_link
+    name="caster_ball"
+    radius="${cw_radius}"
+    mass="${cw_mass}"
+    material="gray"/>
+
+  <joint name="caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster_ball"/>
+    <origin xyz="${chassis_length/2 - cw_radius} 0 ${-(chassis_height/2)}" rpy="0 0 0"/>
+  </joint>
+
+</robot>

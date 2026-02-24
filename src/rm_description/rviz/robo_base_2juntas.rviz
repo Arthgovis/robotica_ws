@@ -77,17 +77,17 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        end_effector:
+        caster_ball:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        link1:
+        left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        link2:
+        right_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -111,11 +111,11 @@ Visualization Manager:
           Value: true
         base_link:
           Value: true
-        end_effector:
+        caster_ball:
           Value: true
-        link1:
+        left_wheel:
           Value: true
-        link2:
+        right_wheel:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -125,10 +125,12 @@ Visualization Manager:
       Tree:
         base_footprint:
           base_link:
-            link1:
-              link2:
-                end_effector:
-                  {}
+            caster_ball:
+              {}
+            left_wheel:
+              {}
+            right_wheel:
+              {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -177,7 +179,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.436652898788452
+      Distance: 1.417336344718933
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -192,10 +194,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8753980398178101
+      Pitch: 0.280397891998291
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.0553972721099854
+      Yaw: 1.4853951930999756
     Saved: ~
 Window Geometry:
   Displays:
@@ -213,5 +215,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 1213
-  Y: 134
+  X: 1181
+  Y: 102
