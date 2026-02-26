@@ -93,7 +93,7 @@
     mass="${wheel_1_mass}"
     material="red"/>
 
-  <joint name="right_wheel_joint" type="continuous">
+  <joint name="left_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="right_wheel"/>
     <origin xyz="0 ${chassis_width/2} 0" rpy="0 0 0"/>
@@ -111,7 +111,7 @@
     mass="${wheel_2_mass}"
     material="red"/>
 
-  <joint name="left_wheel_joint" type="continuous">
+  <joint name="right_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_wheel"/>
     <origin xyz="0 ${-chassis_width/2} 0" rpy="0 0 0"/>
