@@ -13,11 +13,14 @@ def generate_launch_description():
     pkg_name = 'rm_description'
     pkg_share = get_package_share_directory(pkg_name)
 
+    # Caminho para o arquivo de configuração da ponte
+    bridge_config = os.path.join(pkg_share, 'config', 'gz_bridge.yaml')
+
     # Caminho para o arquivo do mundo
-    world_file = os.path.join(pkg_share, 'world', '/home/arthur/robotica_ws/casa_modificada.sdf')
+    world_file = os.path.join(pkg_share, 'world', 'casa.sdf')
 
     # Processar o arquivo XACRO para obter o URDF
-    xacro_file = os.path.join(pkg_share, 'urdf', '/home/arthur/robotica_ws/src/rm_description/urdf/differential_robot.xacro')
+    xacro_file = os.path.join(pkg_share, 'urdf', 'differential_robot.xacro')
     doc = xacro.parse(open(xacro_file))
     xacro.process_doc(doc)
     robot_description = doc.toxml()
@@ -66,8 +69,29 @@ def generate_launch_description():
         output='screen',
     )
 
+    # 4. Ponte Gazebo ↔ ROS 2
+    ros_gz_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=[
+            '--ros-args',
+            '-p',
+            f'config_file:={bridge_config}',
+        ],
+        output='screen',
+    )
+
+    # 5. Ponte de imagem (otimizada para tópicos de imagem)
+    ros_gz_image_bridge = Node(
+        package='ros_gz_image',
+        executable='image_bridge',
+        arguments=['/camera/image_raw'],
+    )
+
     return LaunchDescription([
         gazebo,
         robot_state_publisher,
         spawn_robot,
+        ros_gz_bridge,
+        ros_gz_image_bridge,
     ])

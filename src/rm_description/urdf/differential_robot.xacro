@@ -39,8 +39,11 @@
     xacro:include importa o conteúdo de outros arquivos .xacro
     $(find package_name) retorna o caminho do pacote ROS
   -->
-  <xacro:include filename="$(find rm_description)/urdf/dr_properties.xacro"/>
-  <xacro:include filename="$(find rm_description)/urdf/dr_macros.xacro"/>
+  <xacro:include filename="$(find rm_description)/urdf/properties.xacro"/>
+  <xacro:include filename="$(find rm_description)/urdf/wheels.xacro"/>
+  <xacro:include filename="$(find rm_description)/urdf/gazebo_control.xacro" />
+  <xacro:include filename="$(find rm_description)/urdf/sensors.xacro" />
+
 
   <!-- ==================== -->
   <!-- BASE FOOTPRINT       -->
@@ -52,20 +55,20 @@
   <!-- ==================== -->
   <link name="base_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="${offset} 0 0" rpy="0 0 0"/>
       <geometry>
         <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
       </geometry>
-      <material name="black"/>
+      <material name="dark_gray"/>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="${offset} 0 0" rpy="0 0 0"/>
       <geometry>
         <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
       </geometry>
     </collision>
     <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="${offset} 0 0" rpy="0 0 0"/>
       <mass value="${chassis_mass}"/>
       <inertia
         ixx="${(1/12) * chassis_mass * (chassis_width*chassis_width + chassis_height*chassis_height)}"
@@ -79,7 +82,7 @@
   <joint name="base_joint" type="fixed">
     <parent link="base_footprint"/>
     <child link="base_link"/>
-    <origin xyz="0 0 ${wheel_1_radius}" rpy="0 0 0"/>
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
   </joint>
 
   <!-- ==================== -->
@@ -88,15 +91,15 @@
   <!-- Usa cylinder_link com Y+ para posicionar o cilindro na direção positiva do eixo Y -->
   <xacro:cylinder_link_right
     name="right_wheel"
-    length="${wheel_1_length}"
-    radius="${wheel_1_radius}"
-    mass="${wheel_1_mass}"
+    length="${wheel_length}"
+    radius="${wheel_radius}"
+    mass="${wheel_mass}"
     material="red"/>
 
   <joint name="left_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="right_wheel"/>
-    <origin xyz="0 ${chassis_width/2} 0" rpy="0 0 0"/>
+    <origin xyz="0 ${chassis_width/2 + wheel_length/2} 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -106,15 +109,15 @@
   <!-- Usa cylinder_link com Y- para posicionar o cilindro na direção negativa do eixo Y -->
   <xacro:cylinder_link_left
     name="left_wheel"
-    length="${wheel_2_length}"
-    radius="${wheel_2_radius}"
-    mass="${wheel_2_mass}"
+    length="${wheel_length}"
+    radius="${wheel_radius}"
+    mass="${wheel_mass}"
     material="red"/>
 
   <joint name="right_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_wheel"/>
-    <origin xyz="0 ${-chassis_width/2} 0" rpy="0 0 0"/>
+    <origin xyz="0 ${-chassis_width/2 - wheel_length/2} 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -126,12 +129,105 @@
     name="caster_ball"
     radius="${cw_radius}"
     mass="${cw_mass}"
-    material="gray"/>
+    material="silver"/>
 
   <joint name="caster_joint" type="fixed">
     <parent link="base_link"/>
     <child link="caster_ball"/>
-    <origin xyz="${chassis_length/2 - cw_radius} 0 ${-(chassis_height/2)}" rpy="0 0 0"/>
+    <origin xyz="${chassis_length/2 - cw_radius + offset} 0 ${-(chassis_height/2)}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==================== -->
+  <!-- CÂMERA               -->
+  <!-- ==================== -->
+
+  <link name="camera">
+    <visual>
+      <!-- Desloca para que a BASE do cilindro fique na origem -->
+      <origin xyz="${-camera_length/2} 0 0" rpy="0 1.57079 0"/>
+      <geometry>
+        <cylinder radius="${camera_radius}" length="${camera_length}"/>
+      </geometry>
+      <material name="gray"/>
+    </visual>
+
+    <collision>
+      <origin xyz="${-camera_length/2} 0 0" rpy="0 1.57079 0"/>
+      <geometry>
+        <cylinder radius="${camera_radius}" length="${camera_length}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="${-camera_length/2} 0 0" rpy="0 1.57079 0"/>
+      <mass value="${camera_mass}"/>
+      <!-- Fórmula de inércia para cilindro sólido -->
+      <inertia
+        ixx="${(1/12) * camera_mass * (3*camera_radius*camera_radius + camera_length*camera_length)}"
+        ixy="0.0" ixz="0.0"
+        iyy="${(1/12) * camera_mass * (3*camera_radius*camera_radius + camera_length*camera_length)}"
+        iyz="0.0"
+        izz="${(1/2) * camera_mass * camera_radius * camera_radius}"/>
+    </inertial>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="camera"/>
+  <origin xyz="${chassis_length/2 + offset} 0 ${chassis_height/2 + camera_radius}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==================== -->
+  <!-- LIDAR               -->
+  <!-- ==================== -->
+
+  <link name="lidar">
+    <visual>
+      <!-- Desloca para que a BASE do cilindro fique na origem -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_radius}" length="${lidar_length}"/>
+      </geometry>
+      <material name="gray"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_radius}" length="${lidar_length}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${lidar_mass}"/>
+      <!-- Fórmula de inércia para cilindro sólido -->
+      <inertia
+        ixx="${(1/12) * lidar_mass * (3*lidar_radius*lidar_radius + lidar_length*lidar_length)}"
+        ixy="0.0" ixz="0.0"
+        iyy="${(1/12) * lidar_mass * (3*lidar_radius*lidar_radius + lidar_length*lidar_length)}"
+        iyz="0.0"
+        izz="${(1/2) * lidar_mass * lidar_radius * lidar_radius}"/>
+    </inertial>
+  </link>
+
+  <joint name="lidar_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="lidar"/>
+  <origin xyz="0 0 ${chassis_height/2 + lidar_length/2}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==================== -->
+  <!-- IMU                  -->
+  <!-- ==================== -->
+
+  <link name="imu">
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="imu"/>
+  <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
 </robot>
