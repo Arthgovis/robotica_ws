@@ -88,10 +88,20 @@ def generate_launch_description():
         arguments=['/camera/image_raw'],
     )
 
+    # 6. Lançar o programa do Rviz para visualização
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', os.path.join(pkg_share, 'config', '/home/arthur/robotica_ws/src/rm_description/rviz/monitor_robo.rviz')],
+    )
+
     return LaunchDescription([
         gazebo,
         robot_state_publisher,
         spawn_robot,
         ros_gz_bridge,
         ros_gz_image_bridge,
+        rviz,
     ])

@@ -7,7 +7,7 @@
   <!-- ============================================ -->
 
   <!-- ========================= -->
-  <!-- MACRO: LINK CILÍNDRICO Y+ -->
+  <!-- MACRO: LINK CILÍNDRICO  -->
   <!-- ========================= -->
   <!--
     Cria um link cilíndrico completo com visual, collision e inertial.
@@ -20,53 +20,7 @@
       - mass: massa em kg
       - material: nome do material (definido em properties.xacro)
   -->
-  <xacro:macro name="cylinder_link_right" params="name length radius mass material">
-    <link name="${name}">
-      <visual>
-        <!-- Desloca para que a BASE do cilindro fique na origem -->
-        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-        <geometry>
-          <cylinder radius="${radius}" length="${length}"/>
-        </geometry>
-        <material name="${material}"/>
-      </visual>
-
-      <collision>
-        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-        <geometry>
-          <cylinder radius="${radius}" length="${length}"/>
-        </geometry>
-      </collision>
-
-      <inertial>
-        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-        <mass value="${mass}"/>
-        <!-- Fórmula de inércia para cilindro sólido -->
-        <inertia
-          ixx="${(1/12) * mass * (3*radius*radius + length*length)}"
-          ixy="0.0" ixz="0.0"
-          iyy="${(1/12) * mass * (3*radius*radius + length*length)}"
-          iyz="0.0"
-          izz="${(1/2) * mass * radius * radius}"/>
-      </inertial>
-    </link>
-  </xacro:macro>
-
-  <!-- ========================= -->
-  <!-- MACRO: LINK CILÍNDRICO Y- -->
-  <!-- ========================= -->
-  <!--
-    Cria um link cilíndrico completo com visual, collision e inertial.
-    O cilindro é posicionado com a BASE na origem do link.
-
-    Parâmetros:
-      - name: nome do link
-      - length: comprimento do cilindro (eixo Y)
-      - radius: raio do cilindro
-      - mass: massa em kg
-      - material: nome do material (definido em properties.xacro)
-  -->
-  <xacro:macro name="cylinder_link_left" params="name length radius mass material">
+  <xacro:macro name="cylinder_link" params="name length radius mass material">
     <link name="${name}">
       <visual>
         <!-- Desloca para que a BASE do cilindro fique na origem -->

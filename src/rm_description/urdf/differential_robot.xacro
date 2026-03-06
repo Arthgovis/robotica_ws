@@ -86,29 +86,11 @@
   </joint>
 
   <!-- ==================== -->
-  <!-- RIGHT WHEEL (Y+)      -->
+  <!-- RIGHT WHEEL      -->
   <!-- ==================== -->
   <!-- Usa cylinder_link com Y+ para posicionar o cilindro na direção positiva do eixo Y -->
-  <xacro:cylinder_link_right
+  <xacro:cylinder_link
     name="right_wheel"
-    length="${wheel_length}"
-    radius="${wheel_radius}"
-    mass="${wheel_mass}"
-    material="red"/>
-
-  <joint name="left_wheel_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="right_wheel"/>
-    <origin xyz="0 ${chassis_width/2 + wheel_length/2} 0" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
-  </joint>
-
-  <!-- ==================== -->
-  <!-- LEFT WHEEL (Y-)      -->
-  <!-- ==================== -->
-  <!-- Usa cylinder_link com Y- para posicionar o cilindro na direção negativa do eixo Y -->
-  <xacro:cylinder_link_left
-    name="left_wheel"
     length="${wheel_length}"
     radius="${wheel_radius}"
     mass="${wheel_mass}"
@@ -116,8 +98,26 @@
 
   <joint name="right_wheel_joint" type="continuous">
     <parent link="base_link"/>
-    <child link="left_wheel"/>
+    <child link="right_wheel"/>
     <origin xyz="0 ${-chassis_width/2 - wheel_length/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- ==================== -->
+  <!-- LEFT WHEEL      -->
+  <!-- ==================== -->
+  <!-- Usa cylinder_link com Y- para posicionar o cilindro na direção negativa do eixo Y -->
+  <xacro:cylinder_link
+    name="left_wheel"
+    length="${wheel_length}"
+    radius="${wheel_radius}"
+    mass="${wheel_mass}"
+    material="red"/>
+
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel"/>
+    <origin xyz="0 ${chassis_width/2 + wheel_length/2} 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -174,7 +174,7 @@
   <joint name="camera_joint" type="fixed">
   <parent link="base_link"/>
   <child link="camera"/>
-  <origin xyz="${chassis_length/2 + offset} 0 ${chassis_height/2 + camera_radius}" rpy="0 0 0"/>
+  <origin xyz="${chassis_length/2 + offset + camera_length/2} 0 0" rpy="0 0 0"/>
   </joint>
 
   <!-- ==================== -->
