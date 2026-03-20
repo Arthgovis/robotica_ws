@@ -1,0 +1,5 @@
+int64 count_up_to
+---
+int64 final_count
+---
+int64 current_number
