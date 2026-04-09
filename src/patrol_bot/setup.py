@@ -29,7 +29,6 @@ setup(
         'console_scripts': [
             'patrol_node = patrol_bot.patrol_node:main',
             'rotate_node = patrol_bot.rotate_node:main',
-            'start_patrol = patrol_bot.start_patrol:main',
         ],
     },
 )
